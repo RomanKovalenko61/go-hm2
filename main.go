@@ -1,24 +1,27 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
+	"go-hm2/handlers"
+	"go-hm2/service"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
-type Response struct {
-	Message string `json:"message"`
-}
-
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(Response{Message: "Добро пожаловать в API"})
-}
-
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/", homeHandler).Methods("GET")
+	userService := service.NewUserService()
+	userHandler := handlers.NewUserHandler(userService)
 
+	r := mux.NewRouter()
+
+	api := r.PathPrefix("/api").Subrouter()
+	api.HandleFunc("/users", userHandler.GetAll).Methods("GET")
+	api.HandleFunc("/users", userHandler.CreateUser).Methods("POST")
+	api.HandleFunc("/users/{id}", userHandler.GetByID).Methods("GET")
+	api.HandleFunc("/users/{id}", userHandler.UpdateUser).Methods("PUT")
+	api.HandleFunc("/users/{id}", userHandler.DeleteUser).Methods("DELETE")
+
+	fmt.Println("Запускаем сервер на :8080")
 	http.ListenAndServe(":8080", r)
 }
