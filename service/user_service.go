@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"fmt"
 	"go-hm2/models"
 	"sync"
 )
@@ -41,7 +41,7 @@ func (s *UserService) GetById(id int) (*models.User, error) {
 
 	user, exists := s.users[id]
 	if !exists {
-		return nil, errors.New("user not found")
+		return nil, s.userNotFoundError(id)
 	}
 
 	return user, nil
@@ -53,7 +53,7 @@ func (s *UserService) Update(id int, req *models.UpdateUserRequest) (*models.Use
 
 	user, exists := s.users[id]
 	if !exists {
-		return nil, errors.New("user not found")
+		return nil, s.userNotFoundError(id)
 	}
 
 	if req.Name != "" {
@@ -72,7 +72,7 @@ func (s *UserService) Delete(id int) error {
 
 	_, exists := s.users[id]
 	if !exists {
-		return errors.New("user not found")
+		return s.userNotFoundError(id)
 	}
 	delete(s.users, id)
 
@@ -89,4 +89,13 @@ func (s *UserService) GetAll() []*models.User {
 	}
 
 	return userList
+}
+
+func (s *UserService) userExists(id int) (*models.User, bool) {
+	user, exists := s.users[id]
+	return user, exists
+}
+
+func (s *UserService) userNotFoundError(id int) error {
+	return fmt.Errorf("user with ID %d not found", id)
 }
