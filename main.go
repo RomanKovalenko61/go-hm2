@@ -5,6 +5,7 @@ import (
 	"go-hm2/handlers"
 	"go-hm2/metrics"
 	"go-hm2/service"
+	"go-hm2/utils"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,6 +18,7 @@ func main() {
 
 	r := mux.NewRouter()
 
+	r.Use(utils.RateLimitMiddleware)
 	r.Use(metrics.Handler)
 
 	r.Handle("/metrics", promhttp.Handler())
