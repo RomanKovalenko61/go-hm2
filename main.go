@@ -18,7 +18,7 @@ func main() {
 	api := r.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/users", userHandler.GetAll).Methods("GET")
 	api.HandleFunc("/users", userHandler.CreateUser).Methods("POST")
-	api.HandleFunc("/users/{id}", userHandler.GetByID).Methods("GET")
+	api.HandleFunc("/users/{id}", userHandler.GetUserByID).Methods("GET")
 	api.HandleFunc("/users/{id}", userHandler.UpdateUser).Methods("PUT")
 	api.HandleFunc("/users/{id}", userHandler.DeleteUser).Methods("DELETE")
 

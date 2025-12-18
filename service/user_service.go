@@ -3,11 +3,13 @@ package service
 import (
 	"errors"
 	"go-hm2/models"
+	"sync"
 )
 
 type UserService struct {
 	users  map[int]*models.User
 	nextID int
+	mutex  sync.RWMutex
 }
 
 func NewUserService() *UserService {
@@ -17,7 +19,10 @@ func NewUserService() *UserService {
 	}
 }
 
-func (s *UserService) CreateUser(req *models.CreateUserRequest) *models.User {
+func (s *UserService) Create(req *models.CreateUserRequest) *models.User {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
 	user := &models.User{
 		ID:    s.nextID,
 		Name:  req.Name,
@@ -31,8 +36,10 @@ func (s *UserService) CreateUser(req *models.CreateUserRequest) *models.User {
 }
 
 func (s *UserService) GetById(id int) (*models.User, error) {
-	user, exists := s.users[id]
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
 
+	user, exists := s.users[id]
 	if !exists {
 		return nil, errors.New("user not found")
 	}
@@ -40,9 +47,11 @@ func (s *UserService) GetById(id int) (*models.User, error) {
 	return user, nil
 }
 
-func (s *UserService) UpdateUser(id int, req *models.UpdateUserRequest) (*models.User, error) {
-	user, exists := s.users[id]
+func (s *UserService) Update(id int, req *models.UpdateUserRequest) (*models.User, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 
+	user, exists := s.users[id]
 	if !exists {
 		return nil, errors.New("user not found")
 	}
@@ -57,18 +66,23 @@ func (s *UserService) UpdateUser(id int, req *models.UpdateUserRequest) (*models
 	return user, nil
 }
 
-func (s *UserService) DeleteUser(id int) error {
-	_, exists := s.users[id]
+func (s *UserService) Delete(id int) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 
+	_, exists := s.users[id]
 	if !exists {
 		return errors.New("user not found")
 	}
-
 	delete(s.users, id)
+
 	return nil
 }
 
 func (s *UserService) GetAll() []*models.User {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
 	userList := make([]*models.User, 0, len(s.users))
 	for _, user := range s.users {
 		userList = append(userList, user)

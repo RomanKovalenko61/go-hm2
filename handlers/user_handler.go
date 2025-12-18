@@ -25,14 +25,14 @@ func (handler *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	savedUser := handler.userService.CreateUser(&req)
+	savedUser := handler.userService.Create(&req)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(savedUser)
 }
 
-func (handler *UserHandler) GetByID(w http.ResponseWriter, r *http.Request) {
+func (handler *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -64,7 +64,7 @@ func (handler *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedUser, err := handler.userService.UpdateUser(id, &req)
+	updatedUser, err := handler.userService.Update(id, &req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -82,7 +82,7 @@ func (handler *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := handler.userService.DeleteUser(id); err != nil {
+	if err := handler.userService.Delete(id); err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
