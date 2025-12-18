@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -49,7 +50,7 @@ func Handler(next http.Handler) http.Handler {
 		next.ServeHTTP(wrapped, r)
 
 		duration := time.Since(start).Seconds()
-		status := string(rune(wrapped.statusCode))
+		status := strconv.Itoa(wrapped.statusCode)
 
 		TotalRequests.WithLabelValues(r.Method, r.URL.Path, status).Inc()
 		RequestDuration.WithLabelValues(r.Method, r.URL.Path).Observe(duration)
