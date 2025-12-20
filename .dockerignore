@@ -1,0 +1,37 @@
+# Игнорируемые файлы при сборке Docker образа
+.git
+.gitignore
+.dockerignore
+*.md
+README.md
+docker-compose.yml
+Dockerfile
+prometheus.yml
+grafana/
+
+# Бинарники и исполняемые файлы
+*.exe
+*.dll
+*.so
+*.dylib
+main
+
+# Тестовые файлы
+*_test.go
+*.test
+
+# Зависимости и временные файлы
+vendor/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Логи
+*.log
+
+# OS файлы
+.DS_Store
+Thumbs.db
+
